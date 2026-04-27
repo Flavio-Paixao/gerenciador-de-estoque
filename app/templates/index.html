@@ -474,6 +474,10 @@
   <div class="modal">
     <div class="modal-title">Novo Produto</div>
     <div class="form-group">
+  <label class="form-label">Código</label>
+  <input class="form-input" id="prod-codigo" type="text" placeholder="Ex: PROD-001"/>
+</div>
+    <div class="form-group">
       <label class="form-label">Nome</label>
       <input class="form-input" id="prod-nome" type="text" placeholder="Nome do produto"/>
     </div>
@@ -661,7 +665,7 @@ function renderCategorias(lista) {
 function renderMovimentacoes(lista) {
   const tbody = document.getElementById('tbody-movimentacoes');
   if (!lista.length) {
-    tbody.innerHTML = '<tr><td colspan="5" class="empty">Nenhuma movimentação registrada</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="6" class="empty">Nenhuma movimentação registrada</td></tr>';
     return;
   }
   tbody.innerHTML = lista.map(m => `
@@ -673,6 +677,7 @@ function renderMovimentacoes(lista) {
       <td>${m.quantidade}</td>
       <td style="color:var(--muted)">${m.observacao || '—'}</td>
       <td style="color:var(--muted);font-size:11px">${new Date(m.criado_em).toLocaleDateString('pt-BR')}</td>
+      <td><button class="btn btn-danger" onclick="deletarMovimentacao(${m.id})">Deletar</button></td>
     </tr>
   `).join('');
 }
@@ -727,6 +732,7 @@ function filtrarProdutos() {
 // ===== SALVAR =====
 async function salvarProduto() {
   const data = {
+    codigo: document.getElementById('prod-codigo').value,
     nome: document.getElementById('prod-nome').value,
     descricao: document.getElementById('prod-desc').value,
     preco: document.getElementById('prod-preco').value,
@@ -792,6 +798,12 @@ async function deletarProduto(id) {
 async function deletarCategoria(id) {
   if (!confirm('Deletar esta categoria?')) return;
   await fetch(`${API}/categorias/${id}/`, { method: 'DELETE', headers: { 'X-CSRFToken': csrftoken } });
+  carregarTudo();
+}
+
+async function deletarMovimentacao(id) {
+  if (!confirm('Deletar esta movimentação?')) return;
+  await fetch(`${API}/movimentacoes/${id}/`, { method: 'DELETE', headers: { 'X-CSRFToken': csrftoken } });
   carregarTudo();
 }
 
